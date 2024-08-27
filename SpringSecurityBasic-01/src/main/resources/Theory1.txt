@@ -1,0 +1,67 @@
+**************************************************************************************************
+ implementation 'org.springframework.boot:spring-boot-starter-security'
+
+> When we add the above dependency, by default it will ask for login before accessing any api.
+> http://localhost:8888/logout
+> http://localhost:8888/login
+> The above two api will be enable after adding above dependency.
+
+> when we login by default it will hit the http://localhost:8888/ api after entering username and default pass.
+> http://localhost:8888/book/2/, when we login with user id and default pass , it will redirect to
+  http://localhost:8888/book/2/ but for http://localhost:8888/login -> http://localhost:8888/
+
+
+**************************************************************************************************
+StateFull vs Stateless :
+    SessionFull: In this case, each request is dependent upon previous request which means if we login once for next
+    login we don't have login back again.
+
+    SessionLess: Each request id independent and for each request user has be authenticated.
+
+**************************************************************************************************
+why we disable csrf:
+    In ideal scenarios we keep session as Stateless
+    NOTE: Irrespective of StateFull or StateLess, we always need to provide csrf token if we have to perform any
+    update request.
+
+    So even if we provide userId and password, we would ned to provide csrf token.
+
+When we disable the csrf we don't need to to provide any csrf token.
+
+example:
+    Request -1: to get the token
+    http://localhost:8888/csrf-token
+
+    Response:
+    {
+        "parameterName": "_csrf",
+        "token": "VIoG6AE-w6mDZGfPN7Y1dijfsrU6t4fkmc9Lg140aIcheVNcN-kx3DcPpp-uUASpU5sBEh7sn4wM1LDJ_K5ztjsAUeUTHDU6",
+        "headerName": "X-CSRF-TOKEN"
+    }
+
+    Request-2 : Add the above token in the header and perform the post request.
+    url:
+        http://localhost:8888/book/saveBook
+    Header:
+        X-CSRF-TOKEN: VIoG6AE-w6mDZGfPN7Y1dijfsrU6t4fkmc9Lg140aIcheVNcN-kx3DcPpp-uUASpU5sBEh7sn4wM1LDJ_K5ztjsAUeUTHDU6
+    Response:
+    {
+        "id": 1,
+        "bookName": "Theory Of Giant",
+        "bookPrice": 350.0,
+        "publishDate": "1995-08-02"
+    }
+
+**************************************************************************************************
+
+
+
+
+
+
+
+
+
+
+
+

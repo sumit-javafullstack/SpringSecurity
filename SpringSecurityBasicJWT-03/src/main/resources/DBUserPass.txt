@@ -1,0 +1,62 @@
+**************************************************************************************************
+spring.security.user.name=sumit
+spring.security.user.password=12345
+
+> If we don't want to use default userid and password, we can use above properties.
+
+
+**************************************************************************************************
+Storing userId and Password in db:
+
+UserDetailsService:
+    -> Internally spring boot uses this interface to fetch the record. We will override existing one and setup for
+        our requirements.
+    -> UserDetailsService is an interface, which has one method loadByUsername which returns
+       another interface UserDetails.
+
+    UserDetails:
+    -> This interface provides multiple method to check user details.
+    -> The UserDetails interface which is return type for loadUserByUsername() from interface UserDetailsService.
+
+**************************************************************************************************
+
+AuthenticationProvider:
+    -> This interface is used to connect to the database.
+
+DaoAuthenticationProvider:
+    -> DaoAuthenticationProvider is implementation of AuthenticationProvider.
+
+    -> So we are setting password encoder and user details in the AuthenticationProvider which will interact with
+       database to set/fetch user data.
+            provider.setPasswordEncoder();
+            provider.setUserDetailsService();
+
+**************************************************************************************************
+Security Configuration flow:
+    1) Created security chain filter to filter out requests.
+    2) Created bean of AuthenticationProvider which will access with database by encrypting the password.
+    3) Implemented UserDetailsService and UserDetails and added implementation to AuthenticationProvider.
+
+Code Flow:
+    UserController -> UserService -> Repository.
+NOTE:
+    1) when we uses api, back end it uses security configuration setup by above configuration files.
+    2) if we are accessing any restricted api, internally the credential will be checked by above configurations.
+        and the same for inserting data to tables.
+**************************************************************************************************
+
+
+
+**************************************************************************************************
+
+
+
+
+
+
+
+
+
+
+
+

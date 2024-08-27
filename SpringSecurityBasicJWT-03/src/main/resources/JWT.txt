@@ -1,0 +1,73 @@
+******************************************************************************************************
+> created new package inside security>jwt
+
+> 	implementation 'io.jsonwebtoken:jjwt-api:0.12.5'
+ 	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.5'
+ 	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.5'
+
+******************************************************************************************************
+AuthenticationManager:
+    > It is used for JWT. This will now call AuthenticationProvider.
+
+Authentication authentication =
+        authenticationManager.authenticate(
+            new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword()));
+
+> We just have to pass username and password to authentication manager as behind the scene we already written
+logic to validate users. AuthenticationManager will communicate with AuthenticationProvider.
+
+******************************************************************************************************
+JWT:
+    > JWT token has 3 important parts
+        1) Header which specified algorithm for encryption of token
+        2) payload which has information for subject/expiry/issue time of token.
+        3) Signature which is used to verify the jwt token.
+
+So inorder to generate JWT token, we need to specify certain information like
+    subject,expiry,issue time ,algorithm for encryption and signature.
+
+
+******************************************************************************************************
+JWT Token Generation:
+    > we add subject, expiry, issue date and signature key.
+    > To add key, first we are generating secret key and then signing with HmacSHA256.
+
+    Got to:
+        https://jwt.io/
+    we can validate the token.
+        eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJyYWh1bCIsImlhdCI6MTcyNDczOTIzOCwiZXhwIjoxNzI0NzM5MzQ2fQ.AiPd8jVW237Id6YXUybN3QUpIFs2dG3rNPfJ5R0DpQk
+
+Code flow:
+    we login api gets executed, First It will validate username and password using AuthenticationProvider and then
+    generate token with the help of AuthenticationManager.
+
+******************************************************************************************************
+JWT Token Validation:
+
+> .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+
+       *) By default, the filter is set as UsernamePasswordAuthenticationFilter which means when users tries to access any
+          restricted api, UsernamePasswordAuthenticationFilter will check weather userid and pass is valid or not.
+
+       *) NOW, when we have both JWT token and username and pass, we need to verify
+          > weather JWT token is correct
+          > username password is correct.
+
+> OncePerRequestFilter
+        *) We want to execute this filter chain once per request which each time token and username and pass will be
+           validated.
+
+> SecurityContextHolder.getContext().getAuthentication() == null
+        *) SecurityContextHolder.getContext().getAuthentication() means if the user is not authenticated before.
+
+> applicationContext.getBean(BookUserDetailsService.class).loadUserByUsername(username);
+        *) We are using applicationContext to get object of UserDetails because of cyclic dependency issue.
+        *) Method loadUserByUsername() inside BookUserDetailsService.class return UserDetails object.
+
+CODE Flow:
+    1) Getting token from header
+    2) extracting username from token
+    3) validating token like expiry date etc.
+
+
+******************************************************************************************************
